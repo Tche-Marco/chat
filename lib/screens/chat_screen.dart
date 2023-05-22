@@ -1,11 +1,14 @@
+import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:chat/widgets/text_composer.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+
+import '../widgets/chat_message.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
@@ -60,18 +63,16 @@ class _ChatScreenState extends State<ChatScreen> {
     final User? user = await _getUser();
 
     if (user == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Não foi possível fazer o login. Tente novamente!'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Não foi possível fazer o login. Tente novamente.'),
+        backgroundColor: Colors.red,
+      ));
     }
 
     Map<String, dynamic> data = {
-      'uid': user!.uid,
-      'senderName': user.displayName,
-      'senderPhotoUrl': user.photoURL,
+      "uid": user!.uid,
+      "senderName": user.displayName,
+      "senderPhotoUrl": user.photoURL,
     };
 
     if (imgFile != null) {
@@ -103,7 +104,7 @@ class _ChatScreenState extends State<ChatScreen> {
       body: Column(
         children: [
           Expanded(
-            child: StreamBuilder(
+            child: StreamBuilder<QuerySnapshot>(
               stream:
                   FirebaseFirestore.instance.collection('messages').snapshots(),
               builder: (context, snapshot) {
@@ -121,8 +122,9 @@ class _ChatScreenState extends State<ChatScreen> {
                       itemCount: documents.length,
                       reverse: true,
                       itemBuilder: (context, index) {
-                        return ListTile(
-                          title: Text(documents[index]['text']),
+                        return ChatMessage(
+                          data: documents[index].data() as Map<String, dynamic>,
+                          mine: true,
                         );
                       },
                     );

@@ -34,7 +34,6 @@ class _TextComposerState extends State<TextComposer> {
       child: Row(
         children: [
           IconButton(
-            icon: const Icon(Icons.photo_camera),
             onPressed: () async {
               final XFile? imgFile =
                   await ImagePicker().pickImage(source: ImageSource.camera);
@@ -44,6 +43,7 @@ class _TextComposerState extends State<TextComposer> {
               File fileSend = File(imgFile.path);
               widget.sendMessage(imgFile: fileSend);
             },
+            icon: const Icon(Icons.photo_camera),
           ),
           Expanded(
             child: TextField(
